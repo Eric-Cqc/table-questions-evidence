@@ -1,5 +1,7 @@
 # 表格问数与逐数证据
 
+[![GitHub stars](https://img.shields.io/github/stars/Eric-Cqc/table-questions-evidence?style=flat)](https://github.com/Eric-Cqc/table-questions-evidence/stargazers) · [反馈问题](https://github.com/Eric-Cqc/table-questions-evidence/issues/new/choose) · [查看全部作品](https://github.com/Eric-Cqc)
+
 **把一个明确的表格问题，变成可复算、有来源单元格的答案。**
 
 例如：“各渠道订单金额合计和平均值是多少，缺失金额别当零？”这个工具读取原生命名 Excel Table，按确定的口径计算，并输出每个数字的来源行、有效样本数和缺失排除记录。原文件改变后，旧计划和旧答案都会失效。
@@ -53,3 +55,9 @@ python3 tests/test_workflow.py
 工具不联网、不改原表；但输出 JSON 会保留计划路径、原始字段与用到的单元格，**不是自动脱敏包**。分享真实结果前检查权限和内容。Markdown 动态文本已转义，CSV 危险前缀被转义；JSON 保留原文。哈希用于检测变化，不证明数据真实性或决定者身份。
 
 本仓库没有附带再许可声明。公开展示不等于授予任何额外使用许可。
+
+## 使用、反馈与关注
+
+如果这个项目对你有帮助，欢迎点击仓库右上角 **Star**；想跟进版本更新，可用 **Watch → Custom → Releases**。遇到问题请提交复现步骤、预期与实际结果；也欢迎分享希望解决的业务问题。请只使用合成或已脱敏示例，不提交密钥、个人信息或真实客户资料。
+
+查看 [参与说明](CONTRIBUTING.md)。
