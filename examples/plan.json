@@ -1,0 +1,53 @@
+{
+  "schema_version": 1,
+  "source": {
+    "path": "examples/orders.xlsx",
+    "sha256": "8e60752613fd778c9ac4a57470c08725a5e07730e08cc8bf03e06adbea061a52"
+  },
+  "question": "各渠道已知订单金额合计、均值与订单数是多少？",
+  "interpretation": {
+    "basis": "全部5笔合成订单；金额单位CNY；空金额跳过且披露有效分母，订单数包含空金额订单。",
+    "clarifications": []
+  },
+  "table": "OrdersTable",
+  "formula_policy": "reject",
+  "field_units": {
+    "Amount": "CNY"
+  },
+  "missing_tokens": [],
+  "group_by": [
+    "Channel"
+  ],
+  "metrics": [
+    {
+      "id": "orders",
+      "label": "订单数",
+      "op": "count_rows",
+      "missing": "error",
+      "unit": "count",
+      "scope": "group"
+    },
+    {
+      "id": "total",
+      "label": "已知金额合计",
+      "op": "sum",
+      "expr": {
+        "field": "Amount"
+      },
+      "missing": "skip",
+      "unit": "CNY",
+      "scope": "group"
+    },
+    {
+      "id": "average",
+      "label": "已知金额均值",
+      "op": "mean",
+      "expr": {
+        "field": "Amount"
+      },
+      "missing": "skip",
+      "unit": "CNY",
+      "scope": "group"
+    }
+  ]
+}
