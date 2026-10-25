@@ -17,6 +17,23 @@ sample=importlib.util.module_from_spec(spec)
 spec.loader.exec_module(sample)
 
 class Workflow(unittest.TestCase):
+    def test_utf16_doctype_is_refused(self):
+        with tempfile.TemporaryDirectory() as td:
+            source = Path(td) / 'entity.xlsx'
+            sample.workbook(source)
+            with ZipFile(source) as archive:
+                members = {name: archive.read(name) for name in archive.namelist()}
+            name = 'xl/workbook.xml'
+            xml = members[name].decode().replace('name="Orders"', 'name="&label;"')
+            xml = '<?xml version="1.0" encoding="UTF-16"?><!DOCTYPE workbook [<!ENTITY label "Orders">]>' + xml
+            members[name] = xml.encode('utf-16')
+            with ZipFile(source, 'w') as archive:
+                for name, content in members.items():
+                    archive.writestr(name, content)
+            run = subprocess.run([sys.executable, str(ROOT / 'src/table_analysis.py'), 'inspect', str(source)], capture_output=True, text=True)
+            self.assertEqual(run.returncode, 2, run.stdout)
+            self.assertEqual(json.loads(run.stderr)['code'], 'SOURCE_STRUCTURE')
+
     def run_typed_rows(self, rows, configure, boolean_cells=()):
         with tempfile.TemporaryDirectory() as td:
             d = Path(td); source = d / 'typed.xlsx'

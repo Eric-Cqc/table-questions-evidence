@@ -114,6 +114,12 @@ def scalar_key(value):
     return type(value).__name__, value
 
 
+class NoDTDTreeBuilder(ET.TreeBuilder):
+    def doctype(self, name, pubid, system):
+        # Reject at the parser boundary too: byte searches miss UTF-16 DTDs.
+        fail("SOURCE_STRUCTURE", "XML document types and entities not supported")
+
+
 class Source:
     def __init__(self, path):
         self.path = Path(path).resolve()
@@ -130,7 +136,7 @@ class Source:
             def xml(name):
                 b = z.read(name)
                 require(b"<!DOCTYPE" not in b.upper() and b"<!ENTITY" not in b.upper(), "SOURCE_STRUCTURE", "XML entities not supported")
-                return ET.fromstring(b)
+                return ET.fromstring(b, parser=ET.XMLParser(target=NoDTDTreeBuilder()))
             def rels(base):
                 rp = posixpath.join(posixpath.dirname(base), "_rels", posixpath.basename(base) + ".rels")
                 if rp not in z.namelist():
