@@ -105,6 +105,15 @@ def number(v):
     return x
 
 
+def scalar_key(value):
+    """Compare cell values without conflating booleans and numbers.
+
+    Decimal equality deliberately ignores spelling (1 == 1.0). Keeping the
+    value itself, rather than its string form, preserves that numeric meaning.
+    """
+    return type(value).__name__, value
+
+
 class Source:
     def __init__(self, path):
         self.path = Path(path).resolve()
@@ -451,7 +460,7 @@ class Engine:
         op = m["op"]
         status = "ok"
         if op in ("count_rows", "count_present"): value = Decimal(len(values))
-        elif op == "count_distinct": value = Decimal(len(set((type(v).__name__, str(v)) for v in values)))
+        elif op == "count_distinct": value = Decimal(len(set(scalar_key(v) for v in values)))
         elif not values: value, status = None, "unavailable_empty_sample"
         elif op == "sum": value = sum(values, Decimal(0))
         elif op == "mean": value = sum(values, Decimal(0)) / Decimal(len(values))
@@ -466,7 +475,7 @@ class Engine:
             groups[()] = selected
         else:
             for r in selected:
-                key = tuple(self.read(r, f)[0] for f in self.group_by)
+                key = tuple(scalar_key(self.read(r, f)[0]) for f in self.group_by)
                 groups.setdefault(key, []).append(r)
             require(len(groups) <= 1000, "RESULT_LIMIT", "More than 1000 groups")
         results = []
@@ -483,7 +492,7 @@ class Engine:
                 elif d["op"] == "ratio": value = a["value"] / b["value"] * Decimal(str(d["scale"]))
                 else: value = a["value"] - b["value"]
                 vals[d["id"]] = {"evidence_id": "g" + str(gi) + "." + d["id"], "id": d["id"], "label": d["label"], "value": value, "unit": d["unit"], "status": status, "definition": d, "evidence": {"components": [a["evidence_id"], b["evidence_id"]], "component_values": [a["value"], b["value"]], "component_units": [a["unit"], b["unit"]]}}
-            results.append({"group": dict(zip(self.group_by, key)), "source_rows": rows, "values": vals})
+            results.append({"group": dict(zip(self.group_by, (value for _, value in key))), "source_rows": rows, "values": vals})
         # Stable sorting, unavailable values always last. Full population is computed before Top N.
         for s in reversed(self.p.get("sort", [])):
             present = [g for g in results if g["values"][s["id"]]["value"] is not None]
@@ -626,3 +635,4 @@ def main():
 
 if __name__ == "__main__":
     sys.exit(main())
+
