@@ -1,4 +1,6 @@
 # 表格问数与逐数证据
+Ask an Excel table; keep formulas, cell evidence, and source-change checks.
+
 
 [![GitHub stars](https://img.shields.io/github/stars/Eric-Cqc/table-questions-evidence?style=flat)](https://github.com/Eric-Cqc/table-questions-evidence/stargazers) · [反馈问题](https://github.com/Eric-Cqc/table-questions-evidence/issues/new/choose) · [查看全部作品](https://github.com/Eric-Cqc)
 
